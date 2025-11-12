@@ -1,4 +1,10 @@
+import sys
+import os
 from datetime import datetime
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from exception.exceptions import input_error, WrongEmailFormatException, WrongPhoneNumberFormatException
 from util.validation_util import ValidationUtil
 
@@ -6,45 +12,34 @@ from util.validation_util import ValidationUtil
 class Contact:
     def __init__(self, name, phone, email, address, birthday):
         self.name = name
-        self.__phone = phone
-        self.__email = email
+        self._phone = phone
+        self._email = email
         self.address = address
         self.birthday = birthday
 
+    # Phone getter
     @property
     def phone(self):
-        return self.__phone
+        return self._phone
 
-    @input_error
+    # Phone setter
     @phone.setter
-    def phone(self, phone):
-        if not ValidationUtil.validate_phone(phone):
-            raise WrongPhoneNumberFormatException
-        self.__phone = phone
+    def phone(self, value):
+        if not ValidationUtil.validate_phone(value):
+            raise WrongPhoneNumberFormatException("Invalid phone format")
+        self._phone = value
 
+    # Email getter
     @property
     def email(self):
-        return self.__email
+        return self._email
 
-    @input_error
+    # Email setter
     @email.setter
-    def email(self, email):
-        if not ValidationUtil.validate_email(email):
-            raise WrongEmailFormatException
-        self.__email = email
+    def email(self, value):
+        if not ValidationUtil.validate_email(value):
+            raise WrongEmailFormatException("Invalid email format")
+        self._email = value
 
-
-class ContactBook():
-    def __init__(self):
-        self.__contacts = []
-
-    def birthdays_in_days(self, days):
-        today = datetime.today()
-        result = {}
-        for contact in self.__contacts:
-            bd = contact.birthday
-            bd_this_year = bd.replace(year = today.year)
-            diff = (bd_this_year - today).days
-            if 0 <= diff <= days:
-                result[contact.name] = bd_this_year.date()
-        return result
+    def __str__(self):
+        return f"{self.name}: {self._phone}, {self._email}, {self.address}, {self.birthday.date()}"
