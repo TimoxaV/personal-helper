@@ -1,3 +1,4 @@
+from datetime import datetime
 from exception.exceptions import input_error, WrongEmailFormatException, WrongPhoneNumberFormatException
 from util.validation_util import ValidationUtil
 
@@ -31,3 +32,19 @@ class Contact:
         if not ValidationUtil.validate_email(email):
             raise WrongEmailFormatException
         self.__email = email
+
+
+class ContactBook():
+    def __init__(self):
+        self.__contacts = []
+
+    def birthdays_in_days(self, days):
+        today = datetime.today()
+        result = {}
+        for contact in self.__contacts:
+            bd = contact.birthday
+            bd_this_year = bd.replace(year = today.year)
+            diff = (bd_this_year - today).days
+            if 0 <= diff <= days:
+                result[contact.name] = bd_this_year.date()
+        return result
