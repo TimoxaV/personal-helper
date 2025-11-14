@@ -1,16 +1,13 @@
-import json
-import os
 from model.note import Note
 from exception.exceptions import input_error, NoteNotFound
+from service.storage_service import StorageService
 
 
 class NoteBook:
-    def __init__(self):
-        self.__notes = {}
+    def __init__(self, storage: StorageService):
+        self.__storage = storage
+        self.__notes = {name: Note.from_dict(note) for name, note in storage.load("notes.json").items()}
 
-    # ----------------------------
-    # CRUD
-    # ----------------------------
     @input_error
     def add_note(self, title, text, tags=None):
         if title in self.__notes:
@@ -40,9 +37,6 @@ class NoteBook:
     def get_all_notes(self):
         return list(self.__notes.values())
 
-    # ----------------------------
-    # Робота з тегами
-    # ----------------------------
     @input_error
     def add_tag(self, title, tag):
         if title not in self.__notes:
@@ -62,16 +56,13 @@ class NoteBook:
             return f"Tag '{tag}' removed from note '{title}'."
         return f"Tag '{tag}' not found in note '{title}'."
 
-    # ----------------------------
-    # Пошук і сортування
-    # ----------------------------
     def search_notes(self, keyword):
         results = []
         keyword = keyword.lower()
         for note in self.__notes.values():
             if (keyword in note.title.lower() or
-                keyword in note.text.lower() or
-                any(keyword in tag.lower() for tag in note.tags)):
+                    keyword in note.text.lower() or
+                    any(keyword in tag.lower() for tag in note.tags)):
                 results.append(note)
         return results
 
@@ -80,34 +71,5 @@ class NoteBook:
         not_tagged = [note for note in self.__notes.values() if tag not in note.tags]
         return tagged + not_tagged
 
-    # ----------------------------
-    # Збереження / завантаження
-    # ----------------------------
-    def save(self, filepath="data/notes.json"):
-        os.makedirs(os.path.dirname(filepath), exist_ok=True)
-        with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(
-                {
-                    title: {
-                        "text": n.text,
-                        "tags": n.tags,
-                        "created_at": n.created_at.isoformat()
-                    } for title, n in self.__notes.items()
-                },
-                f,
-                indent=4,
-                ensure_ascii=False
-            )
-
-    def load(self, filepath="data/notes.json"):
-        if not os.path.exists(filepath):
-            return
-        with open(filepath, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            for title, note_data in data.items():
-                note = Note(
-                    title=title,
-                    text=note_data["text"],
-                    tags=note_data.get("tags", [])
-                )
-                self.__notes[title] = note
+    def save(self):
+        self.__storage.save("notes.json", {name: Note.to_dict(note) for name, note in self.__notes.items()})
