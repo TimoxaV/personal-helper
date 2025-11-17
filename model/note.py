@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 class Note:
     def __init__(self, title, text, tags=None, created_at=None):
         self.title = title
@@ -19,7 +20,7 @@ class Note:
             "title": self.title,
             "text": self.text,
             "tags": self.tags,
-            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
         }
 
     @staticmethod
@@ -28,7 +29,5 @@ class Note:
             title=data["title"],
             text=data["text"],
             tags=data.get("tags", []),
-            created_at=datetime.strptime(
-                data["created_at"], "%Y-%m-%d %H:%M:%S"
-            )
+            created_at=datetime.strptime(data["created_at"], "%Y-%m-%d %H:%M:%S"),
         )
