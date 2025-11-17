@@ -1,6 +1,9 @@
 from datetime import datetime, date
 
-from exception.exceptions import WrongEmailFormatException, WrongPhoneNumberFormatException
+from exception.exceptions import (
+    WrongEmailFormatException,
+    WrongPhoneNumberFormatException,
+)
 from util.validation_util import ValidationUtil
 
 
@@ -18,7 +21,7 @@ class Contact:
             "phone": self._phone,
             "email": self._email,
             "address": self.address,
-            "birthday": self.birthday.strftime("%Y-%m-%d")
+            "birthday": self.birthday.strftime("%Y-%m-%d"),
         }
 
     @staticmethod
@@ -28,7 +31,7 @@ class Contact:
             phone=data["phone"],
             email=data["email"],
             address=data["address"],
-            birthday=datetime.strptime(data["birthday"], "%Y-%m-%d").date()
+            birthday=datetime.strptime(data["birthday"], "%Y-%m-%d").date(),
         )
 
     @property
@@ -38,7 +41,9 @@ class Contact:
     @phone.setter
     def phone(self, value):
         if not ValidationUtil.validate_phone(value):
-            raise WrongPhoneNumberFormatException("Invalid phone format")
+            raise WrongPhoneNumberFormatException(
+                "Invalid phone format. Example: +14155552671. The phone may or may not start with plus sign"
+            )
         self._phone = value
 
     @property

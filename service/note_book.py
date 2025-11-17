@@ -6,7 +6,10 @@ from service.storage_service import StorageService
 class NoteBook:
     def __init__(self, storage: StorageService):
         self.__storage = storage
-        self.__notes = {name: Note.from_dict(note) for name, note in storage.load("notes.json").items()}
+        self.__notes = {
+            name: Note.from_dict(note)
+            for name, note in storage.load("notes.json").items()
+        }
 
     @input_error
     def add_note(self, title, text, tags=None):
@@ -60,9 +63,11 @@ class NoteBook:
         results = []
         keyword = keyword.lower()
         for note in self.__notes.values():
-            if (keyword in note.title.lower() or
-                    keyword in note.text.lower() or
-                    any(keyword in tag.lower() for tag in note.tags)):
+            if (
+                keyword in note.title.lower()
+                or keyword in note.text.lower()
+                or any(keyword in tag.lower() for tag in note.tags)
+            ):
                 results.append(note)
         return results
 
@@ -72,4 +77,7 @@ class NoteBook:
         return tagged + not_tagged
 
     def save(self):
-        self.__storage.save("notes.json", {name: Note.to_dict(note) for name, note in self.__notes.items()})
+        self.__storage.save(
+            "notes.json",
+            {name: Note.to_dict(note) for name, note in self.__notes.items()},
+        )

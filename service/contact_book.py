@@ -6,7 +6,7 @@ from util.date_util import is_valid_date
 from exception.exceptions import (
     ContactNotFoundException,
     WrongEmailFormatException,
-    WrongPhoneNumberFormatException
+    WrongPhoneNumberFormatException,
 )
 from model.contact import Contact
 
@@ -14,14 +14,19 @@ from model.contact import Contact
 class ContactBook:
     def __init__(self, storage: StorageService):
         self.__storage = storage
-        self.__contacts = {name: Contact.from_dict(contact) for name, contact in storage.load("contacts.json").items()}
+        self.__contacts = {
+            name: Contact.from_dict(contact)
+            for name, contact in storage.load("contacts.json").items()
+        }
 
     def add_contact(self, name, phone, email, address, birthday):
         if name in self.__contacts:
             raise ContactNotFoundException(f"Contact '{name}' already exists.")
 
         if not ValidationUtil.validate_phone(phone):
-            raise WrongPhoneNumberFormatException("Invalid phone format")
+            raise WrongPhoneNumberFormatException(
+                "Invalid phone format. Example: +14155552671. The phone may or may not start with plus sign"
+            )
 
         if not ValidationUtil.validate_email(email):
             raise WrongEmailFormatException("Invalid email format")
@@ -43,7 +48,9 @@ class ContactBook:
 
         if phone:
             if not ValidationUtil.validate_phone(phone):
-                raise WrongPhoneNumberFormatException("Invalid phone format")
+                raise WrongPhoneNumberFormatException(
+                    "Invalid phone format. Example: +14155552671. The phone may or may not start with plus sign"
+                )
             contact.phone = phone
 
         if email:
@@ -68,10 +75,10 @@ class ContactBook:
 
         for contact in self.__contacts.values():
             if (
-                    keyword in contact.name.lower()
-                    or keyword in contact.email.lower()
-                    or keyword in contact.phone
-                    or keyword in contact.address.lower()
+                keyword in contact.name.lower()
+                or keyword in contact.email.lower()
+                or keyword in contact.phone
+                or keyword in contact.address.lower()
             ):
                 results.append(contact)
 
@@ -94,14 +101,16 @@ class ContactBook:
     def birthdays_in_days(self, days):
         result = []
         today = datetime.now().date()
-        future_date = today + timedelta(days = days)
+        future_date = today + timedelta(days=days)
         for name, contact in self.__contacts.items():
             if is_valid_date(contact.birthday, today, future_date):
                 result.append(contact)
         return result
 
     def save(self):
-        self.__storage.save("contacts.json", {name: c.to_dict() for name, c in self.__contacts.items()})
+        self.__storage.save(
+            "contacts.json", {name: c.to_dict() for name, c in self.__contacts.items()}
+        )
 
     def __str__(self):
         if not self.__contacts:

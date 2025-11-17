@@ -15,7 +15,7 @@ def main():
         "2": ("Search Contact", lambda: search__contacts(contact_book)),
         "3": ("Edit Contact", lambda: edit_contact(contact_book)),
         "4": ("Delete Contact", lambda: delete_contact(contact_book)),
-        "5": ("Birthdays", lambda: birthdays(contact_book)),
+        "5": ("Upcoming Birthdays", lambda: upcoming_birthdays(contact_book)),
         "6": ("Get all Contacts", lambda: get_all_contacts(contact_book)),
         "7": ("Save Contacts", lambda: save__contacts(contact_book)),
         "8": ("Add Note", lambda: add_note(note_book)),
@@ -27,13 +27,17 @@ def main():
         "14": ("Sort Notes by Tag", lambda: sort_by_tag(note_book)),
         "15": ("Get all Notes", lambda: get_all_notes(note_book)),
         "16": ("Save Notes", lambda: save_notes(note_book)),
-        "0": ("Exit", None)
+        "0": ("Exit", None),
+        "help": ("Print Menu", lambda: print_menu()),
     }
 
-    while True:
+    def print_menu():
         print("\nPersonal helper menu:")
         for k, v in commands.items():
             print(f"{k}. {v[0]}")
+
+    print_menu()
+    while True:
         choice = input("Select an option: ")
 
         if choice == "0":
@@ -50,6 +54,7 @@ def main():
 
 
 # ==== Contacts ====
+
 
 def add_contact(contact_book):
     name = input("Name: ")
@@ -74,7 +79,9 @@ def edit_contact(contact_book):
     email = input("New email (press Enter to skip): ")
     address = input("New address (press Enter to skip): ")
     birthday = input("New birthday (press Enter to skip): ")
-    contact_book.edit_contact(name, phone=phone, email=email, address=address, birthday=birthday)
+    contact_book.edit_contact(
+        name, phone=phone, email=email, address=address, birthday=birthday
+    )
     print("Contact was updated successfully")
 
 
@@ -84,7 +91,7 @@ def delete_contact(contact_book):
     print("Contact was deleted")
 
 
-def birthdays(contact_book):
+def upcoming_birthdays(contact_book):
     days = int(input("Number of days to search within: "))
     for contact in contact_book.birthdays_in_days(days):
         print(f"{contact.name} — {contact.birthday}")
@@ -99,6 +106,7 @@ def save__contacts(contact_book):
 
 
 # ==== Notes ====
+
 
 def add_note(note_book):
     title = input("Name: ")
@@ -149,8 +157,10 @@ def sort_by_tag(note_book):
     tag = input("Tag: ")
     pprint(note_book.sort_by_tag(tag))
 
+
 def get_all_notes(note_book):
     pprint(note_book.get_all_notes())
+
 
 if __name__ == "__main__":
     main()

@@ -5,7 +5,7 @@ def input_error(func):
         except ContactNotFoundException:
             return "Contact not found"
         except WrongPhoneNumberFormatException:
-            return "Wrong phone number format"
+            return "Wrong phone number format. Example: +14155552671. The phone may or may not start with plus sign"
         except WrongEmailFormatException:
             return "Wrong email format"
         except NoteNotFound:
